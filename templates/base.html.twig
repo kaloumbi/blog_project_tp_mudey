@@ -11,10 +11,30 @@
 
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
+            <link rel="stylesheet" href="/_assets/css/main.css">
         {% endblock %}
     </head>
     <body>
-    
+        <header>
+            <a href="{{ path('app_blog') }}">
+                <h2>Blog</h2>
+            </a>
+            <nav>
+                <ul class="nav-bar flex aic" >
+                    <li class="nav-item" ><a href="">About</a></li>
+                    <li class="nav-item-down" ><a href="">Categories</a>
+                        <ul class="nav-bar">
+                        {% for category in categories %}
+                            <li class="nav-item" ><a href="/category/{{category.slug}}">{{category.name}} </a>({{category.articles | length}} articles)</li>
+                        {% endfor %}
+                                {# <li class="nav-item" ><a href="">Category 2</a></li>
+                                <li class="nav-item" ><a href="">Category 3</a></li> #}
+                        </ul>
+                    </li>
+                    <li class="nav-item" ><a href="">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
         <div class="container">
             {% block body %}{% endblock %}
         </div>

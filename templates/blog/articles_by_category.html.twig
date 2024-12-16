@@ -2,21 +2,10 @@
 
 {% block title %} Blog Jstore {% endblock %}
 
-{% block slider %} 
-    <div class="slider">
-        <div class="slider-content">
-            <h2>Bienvenue sur le blog Jstore</h2>
-            <h2>Plusieurs articles publiés chaque jour !</h2>
-            <a href="">
-                <button class="btn">consulter</button>
-            </a>
-        </div>
-    </div>
-{% endblock %}
-
 {% block body %}
     <div class="articles-infos">
         <strong>{{articles | length}} articles retrouvés</strong>
+        <p> Article de la Category: <strong> {{category.name}}</strong> </p>
     </div>
     
     <div class="articles">

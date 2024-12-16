@@ -78,4 +78,5 @@ class BlogFixtures extends Fixture
         
         $manager->flush();
     }
+    
 }
