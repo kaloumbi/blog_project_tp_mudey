@@ -30,17 +30,20 @@ class BlogFixtures extends Fixture
                                         ->setCity($faker->city())
                                         ->setCountry($faker->country())
                                         ->setCreatedAt($faker->dateTimeImmutable())
+                                        ->setUser($user); // Associez le profil à l'utilisateur
+
 
             ;
 
             $profile = (new Profile())->setPicture($faker->image())
                                         ->setCoverPicture($faker->image())
                                         ->setDescription($faker->description(60))
-                                        ->setUpdatedAt($faker->dateTimeImmutable())
                                         ->setCreatedAt($faker->dateTimeImmutable())
+                                        ->setUpdatedAt($faker->dateTimeImmutable())
+                                        ->setUser($user); // Associez le profil à l'utilisateur
             ;
             
-            $user->addAddress($address);
+            $user->addAddresses($address);
             
             $user->setProfile($profile);
 

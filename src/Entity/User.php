@@ -2,15 +2,21 @@
 
 namespace App\Entity;
 
+/* use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface; */
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -19,26 +25,34 @@ class User
     #[ORM\Column(length: 60, nullable: false)]
     private ?string $full_name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $password = null;
 
     #[ORM\OneToMany(targetEntity: Address::class, mappedBy: 'user')]
     private Collection $addresses;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'author')]
     private Collection $articles;
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Profile $profile = null;
+
+
+    #[ORM\Column]
+    private array $roles = [];
+
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
+
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
@@ -49,18 +63,6 @@ class User
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getFullName(): ?string
-    {
-        return $this->full_name;
-    }
-
-    public function setFullName(?string $full_name): static
-    {
-        $this->full_name = $full_name;
-
-        return $this;
     }
 
     public function getEmail(): ?string
@@ -75,7 +77,39 @@ class User
         return $this;
     }
 
-    public function getPassword(): ?string
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -87,71 +121,110 @@ class User
         return $this;
     }
 
-   
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
 
     /**
-     * @return Collection<int, Address>
+     * Get the value of full_name
+     *
+     * @return ?string
      */
-    public function getAddresses(): Collection
+    public function getFullName(): ?string
     {
-        return $this->addresses;
+        return $this->full_name;
     }
 
-    public function addAddress(Address $address): static
+    /**
+     * Set the value of full_name
+     *
+     * @param ?string $full_name
+     *
+     * @return self
+     */
+    public function setFullName(?string $full_name): self
     {
-        if (!$this->addresses->contains($address)) {
-            $this->addresses->add($address);
-            $address->setUser($this);
-        }
+        $this->full_name = $full_name;
 
         return $this;
     }
 
-    public function removeAddress(Address $address): static
-    {
-        if ($this->addresses->removeElement($address)) {
-            // set the owning side to null (unless already changed)
-            if ($address->getUser() === $this) {
-                $address->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
+    /**
+     * Get the value of createdAt
+     *
+     * @return ?\DateTimeImmutable
+     */
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    /**
+     * Set the value of createdAt
+     *
+     * @param ?\DateTimeImmutable $createdAt
+     *
+     * @return self
+     */
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    
+
+    /**
+     * Get the value of addresses
+     *
+     * @return Collection
+     */
+    public function getAddresses(): Collection
     {
-        return $this->updatedAt;
+        return $this->addresses;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    /**
+     * Set the value of addresses
+     *
+     * @param Collection $addresses
+     *
+     * @return self
+     */
+    public function addAddresses(Address $addresse): self
     {
-        $this->updatedAt = $updatedAt;
+        if (!$this->addresses->contains($addresse)) {
+            $this->addresses->add($addresse);
+            $addresse->setUser($this);
+        }
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Article>
+     * Get the value of articles
+     *
+     * @return Collection
      */
     public function getArticles(): Collection
     {
         return $this->articles;
     }
 
-    public function addArticle(Article $article): static
+    /**
+     * Set the value of articles
+     *
+     * @param Collection $articles
+     *
+     * @return self
+     */
+    public function addArticles(Article $article): self
     {
         if (!$this->articles->contains($article)) {
             $this->articles->add($article);
@@ -161,30 +234,35 @@ class User
         return $this;
     }
 
-    public function removeArticle(Article $article): static
+    public function removeArticles(Article $article): self
     {
-        if ($this->articles->removeElement($article)) {
-            // set the owning side to null (unless already changed)
-            if ($article->getAuthor() === $this) {
-                $article->setAuthor(null);
-            }
+        if (!$this->articles->removeElement($article)) {
+            $this->articles->add($article);
+            $article->setAuthor($this);
         }
 
         return $this;
     }
 
+    /**
+     * Get the value of profile
+     *
+     * @return ?Profile
+     */
     public function getProfile(): ?Profile
     {
         return $this->profile;
     }
 
-    public function setProfile(Profile $profile): static
+    /**
+     * Set the value of profile
+     *
+     * @param ?Profile $profile
+     *
+     * @return self
+     */
+    public function setProfile(?Profile $profile): self
     {
-        // set the owning side of the relation if necessary
-        if ($profile->getUser() !== $this) {
-            $profile->setUser($this);
-        }
-
         $this->profile = $profile;
 
         return $this;

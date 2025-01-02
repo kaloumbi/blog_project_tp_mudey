@@ -1,0 +1,49 @@
+.form-group{
+    margin: 5px 0;
+    flex-direction: column;
+}
+
+form textarea{
+    border: 1px solid #ccc;
+    resize: none;
+}
+
+form select{
+    border: 1px solid #ccc;
+    min-height: 30px;
+    outline: none;
+    padding: 0 10px;
+}
+
+form input{
+    height: 30px;
+    border: 1px solid #ccc;
+    outline: none;
+    padding: 0 10px;
+    order: 2;
+}
+
+form{
+    max-width: 600px;
+    width: 90%;
+    margin: auto;
+    height: 100%;
+}
+
+
+form .label-container{
+    width: 150px;
+    overflow: hidden;
+    display: none;
+}
+
+form ul{
+    margin: 2px 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8rem;
+}
+
+form ul li{
+    color: red;
+}

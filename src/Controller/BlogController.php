@@ -4,36 +4,43 @@ namespace App\Controller;
 
 use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
+use App\Service\CategoriesServices;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class BlogController extends AbstractController
 {
+
+    public function __construct(CategoriesServices $categoriesServices) {
+        $categoriesServices->updatSession();
+    }
+    
+
     #[Route('/', name: 'app_blog')]
-    public function index(ArticleRepository $articleRepository, CategoryRepository $categoryRepository): Response
+    public function index(Request $request, ArticleRepository $articleRepository): Response
     {
         $articles = $articleRepository->findAll();
-        $categories = $categoryRepository->findAll();
+
+
 
         // dd($articles);
         return $this->render('blog/index.html.twig', [
             'articles' => $articles,
-            'categories' => $categories,
+            // 'categories' => $categories, (remplacer par les sessions)
         ]);
     }
 
     //Notre article par sluge
     #[Route('/article/{slug}', name: 'app_single_article')]
-    public function single(ArticleRepository $articleRepository, string $slug, CategoryRepository $categoryRepository): Response
+    public function single(ArticleRepository $articleRepository, string $slug): Response
     {
         $article = $articleRepository->findOneBySlug($slug);
-        $categories = $categoryRepository->findAll();
 
         // dd($articles);
         return $this->render('blog/single.html.twig', [
             'article' => $article,
-            'categories' => $categories
         ]);
     }
 
@@ -48,14 +55,11 @@ class BlogController extends AbstractController
             $articles = $category->getArticles()->getValues(); //pour les collections
         }
 
-        $categories = $categoryRepository->findAll();
-
         
         // dd($articles);
         return $this->render('blog/articles_by_category.html.twig', [
             'articles' => $articles,
             'category' => $category,
-            'categories' => $categories
         ]);
     }
 }
